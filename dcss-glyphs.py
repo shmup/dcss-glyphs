@@ -6,20 +6,23 @@ import urllib.request
 from string import Template
 import random
 import re
+import pprint
 
 monster_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
 raw_monster_data = urllib.request.urlopen(monster_data)
 
-t = Template('<span class="fg$color" title="$title">$glyph</span>\r\n')
+t = Template('<span $colors class="fg$color" title="$title">$glyph</span>\r\n')
 
 h = """<!-- http://ix.io/10LD/python -->
 <!doctype html>
 <html>
 <meta charset="UTF-8">
 <title>DCSS glyphs</title>
+<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <style>
 ::-moz-selection { color: black; background: lime; }
 ::selection { color: black; background: lime; }
+html, body { width: 100%; height: 100%; margin: 0, padding: 0; }
 body {
     font-family: monospace;
     font-size: 24pt;
@@ -44,12 +47,27 @@ body {
 .fg14 { color: #fce94f; } /* yellow */
 .fg15 { color: #eeeeec; } /* white */
 </style>
+<script>
+$(function() {
+    $("[data-colors]").each(function() {
+     var elem = this;
+      $('body').on("mousemove", this, function() {
+        var colors = $(elem).data("colors").split(" ");
+        var randomColor = colors[Math.floor(Math.random() * colors.length)];
+        elem.className = randomColor;
+      });
+    });
+});
+</script>
 <body>
 """
 
 elemental_colors = {}
 
 def color(c):
+    if "etc_" in c:
+        return elemental_color(c)
+
     return {
         "black":        0,
         "blue":         1,
@@ -73,7 +91,7 @@ def color(c):
 def elemental_color(c):
     if "random" in c:
         return random.randrange(0, 16)
-    return random.choice(elemental_colors[c])
+    return color(random.choice(elemental_colors[c]))
 
 color_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
 raw_color_data = urllib.request.urlopen(color_data)
@@ -97,20 +115,26 @@ for line in raw_color_data:
     elif find_colors and re.match('.*\d+.*', line):
         elemental_colors[current_monster].append(line.split(',')[1].strip().lower())
 
+# pprint.pprint(elemental_colors)
+
 # Find all the monsters and get their colors, glyph and name
 for line in raw_monster_data:
     line = line.decode()
     if re.match('\s+MONS_.*', line):
-        d = line.strip().split(',')
-        c = d[2].strip().lower()
+        parts = line.strip().split(',')
+        c = parts[2].strip().lower()
 
-        if "etc_" in c:
-            c = elemental_color(c)
+        foo = ''
+
+        if 'etc_' in c:
+            if 'random' not in c:
+                foo = "data-colors='" + ' '.join(['fg'+str(color(x)) for x in elemental_colors[c]]) + "'"
 
         h += str(t.substitute(
+            colors=foo,
             color=color(c),
-            title=d[3][2:-1],
-            glyph=d[1][2:-1]
+            title=parts[3][2:-1],
+            glyph=parts[1][2:-1]
         ))
 
 h += """</body>
