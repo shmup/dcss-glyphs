@@ -1,4 +1,4 @@
-# 1!/usr/bin/env python3
+#!/usr/bin/env python3
 #http://crawl.neocities.org/glyphs.html
 #usage: ./dcss-glyphs > out.html
 
