@@ -53,6 +53,11 @@ body { background: black; }
 </style>
 <script>
 $(function() {
+    $("#glyphs span").on("click", function() {
+        if (!this.title) return;
+        window.open("http://crawl.develz.org/info/index.php?q=" + this.title);
+    });
+
     $("[data-colors]").each(function() {
      var elem = this;
       $('body').on("mousemove", this, function() {
