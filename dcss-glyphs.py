@@ -7,6 +7,7 @@ from string import Template
 import random
 import re
 import pprint
+import datetime
 
 monster_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
 raw_monster_data = urllib.request.urlopen(monster_data)
@@ -23,17 +24,18 @@ h = """<!-- http://ix.io/10LD/python -->
 ::-moz-selection { color: black; background: lime; }
 ::selection { color: black; background: lime; }
 html, body, div#wrapper { width:100%; height:100%; margin:0; }
+html, body, div#wrapper { width:100%; height:100%; margin:0; }
+body { font-family: monospace; }
+a { color: #FF69B4; }
+div#info p { padding: 5px; color: white; margin: 0; }
 div#glyphs { 
     padding: 5px;
-    font-family: monospace;
     font-weight: bold;
     cursor: pointer;
     font-size: 2.5vw;
 }
-@media all and (orientation: portrait) {
-    div#glyphs { font-size: 2.5vh; }
-}
-div#glyphs span:hover { outline: 3px solid #FF69B4; }
+@media all and (orientation: portrait) { div#glyphs { font-size: 2.5vh; } }
+div#glyphs span:hover { outline: 4px solid #FF69B4; }
 body { background: black; }
 .fg0 { color: #000000; } /* black */
 .fg1 { color: #204a87; } /* blue */
@@ -60,19 +62,35 @@ $(function() {
     });
 
     $("[data-colors]").each(function() {
-     var elem = this;
-      $('body').on("mousemove", this, function() {
-        var colors = $(elem).data("colors").split(" ");
-        var randomColor = colors[Math.floor(Math.random() * colors.length)];
-        elem.className = randomColor;
+        var elem = this;
+        var paused = null;
+        $('body').on("mousemove", this, function(event) {
+            if (!paused) {
+                paused = setTimeout(function() {
+                    paused = null;
+                    var colors = $(elem).data("colors").split(" ");
+                    var randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    elem.className = randomColor;
+                }, 300);
+            }
       });
     });
 });
 </script>
 <body>
 <div id="wrapper">
-<div id="glyphs">
-"""
+<div id="info">
+<p>DCSS console glyphs generated from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
+
+h += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
+
+h += """</p>
+
+<p>
+Mouseover a glyph to see its name. Click to see the accompany <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
+</p>
+</div>
+<div id="glyphs">"""
 
 elemental_colors = {}
 
