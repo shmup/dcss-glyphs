@@ -81,7 +81,6 @@ def color(c):
         return elemental_color(c)
 
     return {
-        "black":        0,
         "blue":         1,
         "green":        2,
         "cyan":         3,
@@ -102,7 +101,7 @@ def color(c):
 
 def elemental_color(c):
     if "random" in c:
-        return random.randrange(0, 16)
+        return random.randrange(1, 16)
     return color(random.choice(elemental_colors[c]))
 
 color_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
@@ -137,10 +136,16 @@ for line in raw_monster_data:
         c = parts[2].strip().lower()
 
         foo = ''
+        color_list = ''
 
         if 'etc_' in c:
-            if 'random' not in c:
-                foo = "data-colors='" + ' '.join(['fg'+str(color(x)) for x in elemental_colors[c]]) + "'"
+            if 'random' in c:
+                color_list = ' '.join(['fg'+str(x) for x in range(1, 16)])
+            else:
+                color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[c]])
+
+            foo = "data-colors='" + color_list + "'"
+
 
         h += str(t.substitute(
             colors=foo,
