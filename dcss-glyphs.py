@@ -22,14 +22,18 @@ h = """<!-- http://ix.io/10LD/python -->
 <style>
 ::-moz-selection { color: black; background: lime; }
 ::selection { color: black; background: lime; }
-html, body { width: 100%; height: 100%; margin: 0, padding: 0; }
-body {
+html, body, div#wrapper { width:100%; height:100%; margin:0; }
+div#glyphs { 
+    padding: 5px;
     font-family: monospace;
-    font-size: 24pt;
     font-weight: bold;
-    background: black;
     cursor: pointer;
+    font-size: 2.5vw;
 }
+@media all and (orientation: portrait) {
+    div#glyphs { font-size: 2.5vh; }
+}
+body { background: black; }
 .fg0 { color: #000000; } /* black */
 .fg1 { color: #204a87; } /* blue */
 .fg2 { color: #4e9a06; } /* green */
@@ -60,6 +64,8 @@ $(function() {
 });
 </script>
 <body>
+<div id="wrapper">
+<div id="glyphs">
 """
 
 elemental_colors = {}
@@ -137,7 +143,9 @@ for line in raw_monster_data:
             glyph=parts[1][2:-1]
         ))
 
-h += """</body>
+h += """</div>
+</div>
+</body>
 </html>"""
 
 print(h)
