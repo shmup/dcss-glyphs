@@ -33,6 +33,7 @@ div#glyphs {
 @media all and (orientation: portrait) {
     div#glyphs { font-size: 2.5vh; }
 }
+div#glyphs span:hover { outline: 3px solid #FF69B4; }
 body { background: black; }
 .fg0 { color: #000000; } /* black */
 .fg1 { color: #204a87; } /* blue */
