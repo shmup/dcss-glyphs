@@ -80,7 +80,7 @@ $(function() {
 <body>
 <div id="wrapper">
 <div id="info">
-<p>DCSS console glyphs generated from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
+<p>DCSS console glyphs <a href="https://github.com/shmup/dcss-glyphs" target="_blank">generated</a> from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
 
 h += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
 
