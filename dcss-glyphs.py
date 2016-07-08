@@ -6,19 +6,25 @@ import urllib.request
 from string import Template
 import random
 import re
+import sys
 import pprint
 import datetime
 
 monster_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
 raw_monster_data = urllib.request.urlopen(monster_data)
 
+color_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
+raw_color_data = urllib.request.urlopen(color_data)
+
 t = Template('<span $colors class="fg$color" title="$title">$glyph</span>\r\n')
 
+# HTML
 h = """<!-- http://ix.io/10LD/python -->
 <!doctype html>
 <html>
 <meta charset="UTF-8">
 <title>DCSS glyphs</title>
+<link rel="image_src" href="cauldron.png" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <style>
 ::-moz-selection { color: black; background: lime; }
@@ -117,17 +123,32 @@ def color(c):
         "white":        15
     }.get(c, 15)
 
+def random_color():
+    c = random.randrange(1, 16)
+    while c == 8:
+        c = random.randrange(1, 16)
+    return c
+
 def elemental_color(c):
     if "random" in c:
-        return random.randrange(1, 16)
+        return random_color()
     return color(random.choice(elemental_colors[c]))
-
-color_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
-raw_color_data = urllib.request.urlopen(color_data)
 
 found = False
 find_colors = False
 current_monster = ''
+
+def ugly_thing_colors():
+    misc_monster_data = 'https://raw.githubusercontent.com/crawl/crawl/5efadfb8913dc69beeaf7e8adeca6a1c9634ca9f/crawl-ref/source/mon-util.cc'
+    raw_misc_monster_data = urllib.request.urlopen(misc_monster_data)
+    found = False
+
+    for line in raw_misc_monster_data:
+        line = line.decode()
+        if re.match('static const colour_t ugly_colour_values', line):
+            found = True
+        elif found and re.match('(\s+)?[A-Z]+.*', line):
+            return [x.strip().lower() for x in line.split(',')]
 
 # Find all the elemental (etc_foo) colors
 for line in raw_color_data:
@@ -136,42 +157,52 @@ for line in raw_color_data:
         found = True
     elif found and re.match('.*ETC_', line):
         current_monster = line.split(',')[0].strip().lower()
-        elemental_colors[current_monster] = []
-        find_colors = True
+        # SPECIFIC MONSTER CHECKS
+        if "UGLY_THING" in current_monster:
+            elemental_colors[current_monster] = ugly_thing_colors()
+            found = False
+            continue
+        else:
+            elemental_colors[current_monster] = []
+            find_colors = True
     elif find_colors and ";" in line:
         found = False
         find_colors = False
     elif find_colors and re.match('.*\d+.*', line):
         elemental_colors[current_monster].append(line.split(',')[1].strip().lower())
 
-# pprint.pprint(elemental_colors)
-
 # Find all the monsters and get their colors, glyph and name
 for line in raw_monster_data:
     line = line.decode()
     if re.match('\s+MONS_.*', line):
         parts = line.strip().split(',')
-        c = parts[2].strip().lower()
+        mon_color = parts[2].strip().lower()
+        title = parts[3].strip()[1:-1]
+        glyph = parts[1][2:-1]
 
         foo = ''
         color_list = ''
 
-        if 'etc_' in c:
-            if 'random' in c:
+        if 'etc_' in mon_color:
+            if 'random' in mon_color:
                 color_list = ' '.join(['fg'+str(x) for x in range(1, 16)])
             else:
-                color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[c]])
+                color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[mon_color]])
 
             foo = "data-colors='" + color_list + "'"
-
+        elif 'colour_undef' in mon_color:
+            if "ugly thing" in title:
+                color_list = ' '.join(['fg'+str(color(x)) for x in ugly_thing_colors()])
+                foo = "data-colors='" + color_list + "'"
 
         h += str(t.substitute(
             colors=foo,
-            color=color(c),
-            title=parts[3][2:-1],
-            glyph=parts[1][2:-1]
+            color=color(mon_color),
+            title=title,
+            glyph=glyph,
         ))
 
+# HTML
 h += """</div>
 </div>
 </body>
