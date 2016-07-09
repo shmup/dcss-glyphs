@@ -13,8 +13,8 @@ import datetime
 monster_url = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
 color_url = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
 
-monster_data = urllib.request.urlopen(monster_data)
-color_data = urllib.request.urlopen(color_data)
+monster_data = urllib.request.urlopen(monster_url)
+color_data = urllib.request.urlopen(color_url)
 
 template = Template('<span $colors class="fg$color" title="$title">$glyph</span>\r\n')
 
@@ -126,11 +126,13 @@ def color(c):
         "white":        15
     }.get(c, 15)
 
+def random_colors():
+    nums = [x for x in range(1, 16)]
+    nums.remove(8)
+    return nums
+
 def random_color():
-    c = random.randrange(1, 16)
-    while c == 8:
-        c = random.randrange(1, 16)
-    return c
+    return random.choice(random_colors())
 
 def elemental_color(c):
     if "random" in c:
@@ -190,25 +192,31 @@ for line in monster_data:
 
     if re.match('\s+MONS_.*', line):
         m = monster(line)
-   
+
         # etc_things
         if 'etc_' in m['color']:
             if 'random' in m['color']:
-                color_list = ' '.join(['fg'+str(x) for x in range(1, 16)])
+                color_list = ' '.join(['fg'+str(x) for x in random_colors()])
             else:
                 color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[m['color']]])
-
-            colors = "data-colors='" + color_list + "'"
         # undefined color
         elif 'colour_undef' in m['color']:
             if "ugly thing" in m['title']:
                 color_list = ' '.join(['fg'+str(color(x)) for x in ugly_thing_colors()])
-                colors = "data-colors='" + color_list + "'"
+
+        if color_list:
+            m['color'] = random.choice(color_list.split(' '))[2:]
+            colors = "data-colors='" + color_list + "'"
+        else:
+            m['color'] = color(m['color'])
+
+        if m['color'] == 'colour_undef':
+            m['color'] = random_color()
 
         # build and add the template
-        h += str(template.substitute(
+        html += str(template.substitute(
             colors=colors,
-            color=color(m['color']),
+            color=m['color'],
             title=m['title'],
             glyph=m['glyph']
         ))
@@ -219,4 +227,4 @@ html += """</div>
 </body>
 </html>"""
 
-print(h)
+print(html)
