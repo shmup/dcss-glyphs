@@ -10,16 +10,21 @@ import sys
 import pprint
 import datetime
 
-monster_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
-raw_monster_data = urllib.request.urlopen(monster_data)
+monster_url = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
+color_url = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
 
-color_data = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/colour.cc'
-raw_color_data = urllib.request.urlopen(color_data)
+monster_data = urllib.request.urlopen(monster_data)
+color_data = urllib.request.urlopen(color_data)
 
-t = Template('<span $colors class="fg$color" title="$title">$glyph</span>\r\n')
+template = Template('<span $colors class="fg$color" title="$title">$glyph</span>\r\n')
+
+elemental_colors = {}
+found = False
+find_colors = False
+color_type = ''
 
 # HTML
-h = """<!-- http://ix.io/10LD/python -->
+html = """<!-- http://ix.io/10LD/python -->
 <!doctype html>
 <html>
 <meta charset="UTF-8">
@@ -88,17 +93,15 @@ $(function() {
 <div id="info">
 <p>DCSS console glyphs <a href="https://github.com/shmup/dcss-glyphs" target="_blank">generated</a> from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
 
-h += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
+html += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
 
-h += """</p>
+html += """</p>
 
 <p>
 Mouseover a glyph to see its name. Click to see the accompany <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
 </p>
 </div>
 <div id="glyphs">"""
-
-elemental_colors = {}
 
 def color(c):
     if "etc_" in c:
@@ -134,76 +137,84 @@ def elemental_color(c):
         return random_color()
     return color(random.choice(elemental_colors[c]))
 
-found = False
-find_colors = False
-current_monster = ''
-
 def ugly_thing_colors():
     misc_monster_data = 'https://raw.githubusercontent.com/crawl/crawl/5efadfb8913dc69beeaf7e8adeca6a1c9634ca9f/crawl-ref/source/mon-util.cc'
-    raw_misc_monster_data = urllib.request.urlopen(misc_monster_data)
+    misc_monster_data = urllib.request.urlopen(misc_monster_data)
     found = False
 
-    for line in raw_misc_monster_data:
+    for line in misc_monster_data:
         line = line.decode()
         if re.match('static const colour_t ugly_colour_values', line):
             found = True
         elif found and re.match('(\s+)?[A-Z]+.*', line):
             return [x.strip().lower() for x in line.split(',')]
 
-# Find all the elemental (etc_foo) colors
-for line in raw_color_data:
+def monster(data):
+    parts = line.strip().split(',')
+
+    return {
+            'color': parts[2].strip().lower(),
+            'title': parts[3].strip()[1:-1],
+            'glyph': parts[1][2:-1]
+            }
+
+# Find colors for not fully specified monsters
+for line in color_data:
     line = line.decode()
+    # We found a monster's color(s)
     if re.match('\s+add_element_colour\(_create_random_.*', line):
         found = True
+    # Collect monster information
     elif found and re.match('.*ETC_', line):
-        current_monster = line.split(',')[0].strip().lower()
-        # SPECIFIC MONSTER CHECKS
-        if "UGLY_THING" in current_monster:
-            elemental_colors[current_monster] = ugly_thing_colors()
+        # Get color type
+        color_type = line.split(',')[0].strip().lower()
+        if "UGLY_THING" in color_type:
+            elemental_colors[color_type] = ugly_thing_colors()
             found = False
-            continue
         else:
-            elemental_colors[current_monster] = []
+            elemental_colors[color_type] = []
             find_colors = True
+    # End of monster information
     elif find_colors and ";" in line:
         found = False
         find_colors = False
+    # Get color
     elif find_colors and re.match('.*\d+.*', line):
-        elemental_colors[current_monster].append(line.split(',')[1].strip().lower())
+        elemental_colors[color_type].append(line.split(',')[1].strip().lower())
 
 # Find all the monsters and get their colors, glyph and name
-for line in raw_monster_data:
+for line in monster_data:
     line = line.decode()
+    colors = ''
+    color_list = ''
+
     if re.match('\s+MONS_.*', line):
-        parts = line.strip().split(',')
-        mon_color = parts[2].strip().lower()
-        title = parts[3].strip()[1:-1]
-        glyph = parts[1][2:-1]
-
-        foo = ''
-        color_list = ''
-
-        if 'etc_' in mon_color:
-            if 'random' in mon_color:
+        m = monster(line)
+   
+        # etc_things
+        if 'etc_' in m['color']:
+            if 'random' in m['color']:
                 color_list = ' '.join(['fg'+str(x) for x in range(1, 16)])
             else:
-                color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[mon_color]])
+                color_list = ' '.join(['fg'+str(color(x)) for x in elemental_colors[m['color']]])
 
-            foo = "data-colors='" + color_list + "'"
-        elif 'colour_undef' in mon_color:
-            if "ugly thing" in title:
+            colors = "data-colors='" + color_list + "'"
+        # undefined color
+        elif 'colour_undef' in m['color']:
+            if "ugly thing" in m['title']:
                 color_list = ' '.join(['fg'+str(color(x)) for x in ugly_thing_colors()])
-                foo = "data-colors='" + color_list + "'"
+                colors = "data-colors='" + color_list + "'"
 
-        h += str(t.substitute(
-            colors=foo,
-            color=color(mon_color),
-            title=title,
-            glyph=glyph,
+        # build and add the template
+        h += str(template.substitute(
+            colors=colors,
+            color=color(m['color']),
+            title=m['title'],
+            glyph=m['glyph']
         ))
 
 # HTML
-h += """</div>
+html += """</div>
 </div>
 </body>
 </html>"""
