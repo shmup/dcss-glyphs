@@ -24,19 +24,20 @@ find_colors = False
 color_type = ''
 
 # HTML
-html = """<!-- http://ix.io/10LD/python -->
+html = """<!-- https://raw.githubusercontent.com/shmup/dcss-glyphs/master/dcss-glyphs.py -->
 <!doctype html>
 <html>
 <meta charset="UTF-8">
 <title>DCSS glyphs</title>
 <link rel="image_src" href="cauldron.png" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet">
 <style>
 ::-moz-selection { color: black; background: lime; }
 ::selection { color: black; background: lime; }
 html, body, div#wrapper { width:100%; height:100%; margin:0; }
 html, body, div#wrapper { width:100%; height:100%; margin:0; }
-body { font-family: monospace; }
+body { font-family: 'Ubuntu Mono', monospace; }
 a { color: #FF69B4; }
 div#info p { padding: 5px; color: white; margin: 0; }
 div#glyphs { 
@@ -46,7 +47,7 @@ div#glyphs {
     font-size: 2.5vw;
 }
 @media all and (orientation: portrait) { div#glyphs { font-size: 2.5vh; } }
-div#glyphs span:hover { outline: 4px solid #FF69B4; }
+div#glyphs span:hover { outline: 3px solid #FF69B4; }
 body { background: black; }
 .fg0 { color: #000000; } /* black */
 .fg1 { color: #204a87; } /* blue */
