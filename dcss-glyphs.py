@@ -100,7 +100,7 @@ $(function() {
             if (!e.target.value) {
                 history.replaceState({}, "", window.location.pathname);
             } else {
-                history.replaceState({}, "", '#' + e.target.value);
+                history.replaceState({}, "", '#' + escape(e.target.value));
             }
         }
 
@@ -140,7 +140,7 @@ html += """</p>
 <p>
 Mouseover a glyph to see its name. Click to see the accompany <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
 </p>
-<p><input id="filter" type="text" placeholder="filter" autocomplete="off" autofocus></input> <button onclick=reset()>reset</button></p>
+<p><input id="filter" type="text" placeholder="filter" autofocus></input> <button onclick=reset()>reset</button></p>
 </div>
 <div id="glyphs">"""
 
