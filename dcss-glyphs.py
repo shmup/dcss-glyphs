@@ -96,6 +96,14 @@ $(function() {
     });
 
     $("input#filter").on("keyup", function(e) {
+        if (e.keyCode === 13) {
+            if (!e.target.value) {
+                history.replaceState({}, "", window.location.pathname);
+            } else {
+                history.replaceState({}, "", '#' + e.target.value);
+            }
+        }
+
         var paused = null;
         if (!paused && e.keyCode !== 8 && e.keyCode !== 46) {
             paused = setTimeout(function() {
@@ -112,6 +120,7 @@ function reset() {
     filterBox.value = "";
     filter();
     filterBox.focus();
+    history.replaceState({}, "", window.location.pathname);
 }
 function filter(thing) {
     $(".selected").removeClass("selected");
