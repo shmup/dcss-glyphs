@@ -125,7 +125,9 @@ function reset() {
 function filter(thing) {
     $(".selected").removeClass("selected");
     if (!thing) return;
-    $("span[title*='" + thing + "']").addClass("selected");
+    $('span[title]').filter(function() {
+        return this.title.toLowerCase().indexOf(thing.toLowerCase()) > -1;
+    }).addClass("selected");
 }
 </script>
 <body>
