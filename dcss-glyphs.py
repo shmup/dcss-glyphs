@@ -138,7 +138,7 @@ html += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
 html += """</p>
 
 <p>
-Mouseover a glyph to see its name. Click to see the accompany <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
+Mouseover a glyph to see its name. Click to see the accompanying <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
 </p>
 <p><input id="filter" type="text" placeholder="filter" autofocus></input> <button onclick=reset()>reset</button></p>
 </div>
