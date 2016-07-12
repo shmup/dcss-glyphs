@@ -67,6 +67,14 @@ body { background: black; }
 </style>
 <script>
 $(function() {
+    var qs = window.location.hash.substring(1);
+
+    if (qs) {
+        qs = unescape(qs);
+        document.getElementById("filter").value = qs;
+        filter(qs);
+    }
+
     $("#glyphs span").on("click", function() {
         if (!this.title) return;
         window.open("http://crawl.develz.org/info/index.php?q=" + this.title);
