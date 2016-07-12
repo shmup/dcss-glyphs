@@ -26,7 +26,7 @@ html = """<!-- https://raw.githubusercontent.com/shmup/dcss-glyphs/master/dcss-g
 <!doctype html>
 <html>
 <meta charset="UTF-8">
-<title>DCSS glyphs</title>
+<title>DCSS console glyphs</title>
 <link rel="image_src" href="cauldron.png" />
 <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono" rel="stylesheet">
@@ -133,7 +133,7 @@ function filter(thing) {
 <body>
 <div id="wrapper">
 <div id="info">
-<p>DCSS console glyphs last <a href="https://github.com/shmup/dcss-glyphs" target="_blank">generated</a> from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
+<p><a href="http://crawl.develz.org/wordpress/about" target="_blank">DCSS</a> console glyphs last <a href="https://github.com/shmup/dcss-glyphs" target="_blank">generated</a> from <a href="https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h" target="_blank">mon-data.h</a> on """
 
 html += '{:%Y-%m-%d %H:%M:%S}.'.format(datetime.datetime.now())
 
