@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-#http://crawl.neocities.org/glyphs.html
-#usage: ./dcss-glyphs > out.html
+# http://crawl.neocities.org/glyphs.html
+# usage: ./dcss-glyphs > out.html
 
 import urllib.request
 from string import Template
 import random
 import re
-import sys
-import pprint
 import datetime
 
 monster_url = 'https://raw.githubusercontent.com/crawl/crawl/master/crawl-ref/source/mon-data.h'
@@ -46,6 +44,7 @@ div#glyphs {
     cursor: pointer;
     font-size: 2.5vw;
 }
+.selected { outline: 1px solid yellow; }
 @media all and (orientation: portrait) { div#glyphs { font-size: 2.5vh; } }
 div#glyphs span:hover { outline: 3px solid #FF69B4; }
 body { background: black; }
@@ -87,7 +86,30 @@ $(function() {
             }
       });
     });
+
+    $("input#filter").on("keyup", function(e) {
+        var paused = null;
+        if (!paused && e.keyCode !== 8 && e.keyCode !== 46) {
+            paused = setTimeout(function() {
+                paused = null;
+                filter(e.target.value);
+            }, 200);
+        } else {
+            filter(e.target.value);
+        }
+    });
 });
+function reset() {
+    var filterBox = document.getElementById("filter");
+    filterBox.value = "";
+    filter();
+    filterBox.focus();
+}
+function filter(thing) {
+    $(".selected").removeClass("selected");
+    if (!thing) return;
+    $("span[title*='" + thing + "']").addClass("selected");
+}
 </script>
 <body>
 <div id="wrapper">
@@ -101,6 +123,7 @@ html += """</p>
 <p>
 Mouseover a glyph to see its name. Click to see the accompany <a href="http://crawl.develz.org/info/index.php?q=butterfly" target="_blank">LearnDB</a> entry.
 </p>
+<p><input id="filter" type="text" placeholder="filter"></input></p>
 </div>
 <div id="glyphs">"""
 
