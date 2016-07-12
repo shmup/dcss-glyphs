@@ -81,7 +81,7 @@ $(function() {
                     paused = null;
                     var colors = $(elem).data("colors").split(" ");
                     var randomColor = colors[Math.floor(Math.random() * colors.length)];
-                    elem.className = randomColor;
+                    elem.className = randomColor + (elem.className.indexOf("selected") > -1 ? " selected" : "");
                 }, 300);
             }
       });
