@@ -207,7 +207,7 @@ def monster(data):
 for line in color_data:
     line = line.decode()
     # We found a monster's color(s)
-    if re.match('\s+add_element_colour\(_create_random_.*', line):
+    if re.match('\s+add_element_colour\(new .*', line):
         found = True
     # Collect monster information
     elif found and re.match('.*ETC_', line):
