@@ -200,7 +200,7 @@ def monster(data):
     return {
             'color': parts[2].strip().lower(),
             'title': parts[3].strip()[1:-1],
-            'glyph': parts[1][2:-1]
+            'glyph': parts[1][2:3]
             }
 
 # Find colors for not fully specified monsters
