@@ -6,8 +6,7 @@ I wanted to generate all of the various monster glyphs and their appropriate col
 
 You can check out an example here: http://crawl.neocities.org/glyphs.html
 
-It turns out [Neil](http://s-z.org/neil/) did a similar thing with perl, and the information is tabular and a lot more useful. Right now I just have the goal of being accurate and asthetically pleasing.
+It turns out [Neil](http://s-z.org/neil/) did a similar thing with perl, and the information is tabular and a lot more useful. Right now I just have the goal of being accurate and aesthetically pleasing.
 
  * http://s-z.org/neil/tmp/crawl-glyphs-narrow.html
  * http://s-z.org/neil/tmp/crawl-glyphs (script)
-
